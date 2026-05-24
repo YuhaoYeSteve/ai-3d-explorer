@@ -21,7 +21,7 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/你的用户名/ai-3d-explorer.git
+git clone https://github.com/YuhaoYeSteve/ai-3d-explorer.git
 cd ai-3d-explorer
 ```
 
