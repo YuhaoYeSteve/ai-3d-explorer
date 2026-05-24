@@ -202,18 +202,50 @@
         var b64 = data.data[0].b64_json;
         var img = new Image();
         img.onload = function () {
-          fadeOverlay.classList.add('active');
-          setTimeout(function () {
-            var texture = new THREE.Texture(img);
-            texture.mapping = THREE.EquirectangularReflectionMapping;
-            texture.needsUpdate = true;
-            scene.background = texture;
-            scene.environment = texture;
+          var previewOverlay = document.getElementById('preview-overlay');
+          var previewPopup = document.getElementById('preview-popup');
+          var previewImage = document.getElementById('preview-image');
+          previewImage.src = 'data:image/png;base64,' + b64;
+          previewOverlay.classList.add('active');
+          previewPopup.classList.add('active');
+          loadingMsg.innerHTML = '图片已生成，请预览';
+          var applyBtn = document.getElementById('preview-apply-btn');
+          var cancelBtn = document.getElementById('preview-cancel-btn');
+          var closeBtn = document.getElementById('preview-close-btn');
+          function applySkybox() {
+            previewOverlay.classList.remove('active');
+            previewPopup.classList.remove('active');
+            fadeOverlay.classList.add('active');
             setTimeout(function () {
-              fadeOverlay.classList.remove('active');
-            }, 100);
-            loadingMsg.innerHTML = '环境已生成！';
-          }, 500);
+              var texture = new THREE.Texture(img);
+              texture.mapping = THREE.EquirectangularReflectionMapping;
+              texture.needsUpdate = true;
+              scene.background = texture;
+              scene.environment = texture;
+              setTimeout(function () {
+                fadeOverlay.classList.remove('active');
+              }, 100);
+              loadingMsg.innerHTML = '环境已生成！';
+            }, 500);
+            cleanup();
+          }
+          function closePreview() {
+            previewOverlay.classList.remove('active');
+            previewPopup.classList.remove('active');
+            loadingMsg.innerHTML = '已取消应用';
+            loadingMsg.className = 'chat-message system';
+            cleanup();
+          }
+          function cleanup() {
+            applyBtn.removeEventListener('click', applySkybox);
+            cancelBtn.removeEventListener('click', closePreview);
+            closeBtn.removeEventListener('click', closePreview);
+            previewOverlay.removeEventListener('click', closePreview);
+          }
+          applyBtn.addEventListener('click', applySkybox);
+          cancelBtn.addEventListener('click', closePreview);
+          closeBtn.addEventListener('click', closePreview);
+          previewOverlay.addEventListener('click', closePreview);
         };
         img.src = 'data:image/png;base64,' + b64;
       } else {
